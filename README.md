@@ -1,5 +1,5 @@
 # ServoOut
-Class for Arduino and Mbed servo control
+Class for Arduino and Mbed servo control  
 Written by Dan Oates (WPI Class of 2020)
 
 ### Description
