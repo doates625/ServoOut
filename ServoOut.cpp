@@ -19,12 +19,13 @@ ServoOut::ServoOut(
 	float cmd_max,
 	float pw_min,
 	float pw_max)
+	#if defined(PLATFORM_MBED)
+		: pwm_out(pin)
+	#endif
 {
-#if defined(PLATFORM_ARDUINO)
-	this->pin = pin;
-#elif defined(PLATFORM_MBED)
-	this->pwmout = new PwmOut(pin);
-#endif
+	#if defined(PLATFORM_ARDUINO)
+		this->pin = pin;
+	#endif
 	this->pw_min = pw_min;
 	this->pw_max = pw_max;
 	this->pw_per_cmd = (pw_max - pw_min) / (cmd_max - cmd_min);
@@ -43,26 +44,26 @@ ServoOut::ServoOut(
 void ServoOut::set_enabled(bool enabled)
 {
 	this->enabled = enabled;
-#if defined(PLATFORM_ARDUINO)
-	if (enabled)
-	{
-		servo.attach(pin, 1e6 * pw_min, 1e6 * pw_max);
-		set_cmd(cmd);
-	}
-	else
-	{
-		servo.detach();
-	}
-#elif defined(PLATFORM_MBED)
-	if (enabled)
-	{
-		set_cmd(cmd);
-	}
-	else
-	{
-		pwmout->pulsewidth(0.0f);
-	}
-#endif
+	#if defined(PLATFORM_ARDUINO)
+		if (enabled)
+		{
+			servo.attach(pin, 1e6 * pw_min, 1e6 * pw_max);
+			set_cmd(cmd);
+		}
+		else
+		{
+			servo.detach();
+		}
+	#elif defined(PLATFORM_MBED)
+		if (enabled)
+		{
+			set_cmd(cmd);
+		}
+		else
+		{
+			pwm_out.pulsewidth(0.0f);
+		}
+	#endif
 }
 
 /**
@@ -78,10 +79,10 @@ void ServoOut::set_cmd(float cmd)
 	{
 		float pw = pw_per_cmd * cmd + pw_zero;
 		pw = CppUtil::clamp(pw, pw_min, pw_max);
-#if defined(PLATFORM_ARDUINO)
-		servo.writeMicroseconds(1e6 * pw);
-#elif defined(PLATFORM_MBED)
-		pwmout->pulsewidth(pw);
-#endif
+		#if defined(PLATFORM_ARDUINO)
+			servo.writeMicroseconds(1e6 * pw);
+		#elif defined(PLATFORM_MBED)
+			pwm_out.pulsewidth(pw);
+		#endif
 	}
 }

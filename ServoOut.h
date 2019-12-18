@@ -28,12 +28,12 @@ public:
 	void set_enabled(bool enabled);
 	void set_cmd(float cmd);
 protected:
-#if defined(PLATFORM_ARDUINO)
-	Servo servo;
-	uint8_t pin;
-#elif defined(PLATFORM_MBED)
-	PwmOut* pwmout;
-#endif
+	#if defined(PLATFORM_ARDUINO)
+		Servo servo;
+		uint8_t pin;
+	#elif defined(PLATFORM_MBED)
+		PwmOut pwm_out;
+	#endif
 	bool enabled;
 	float cmd;
 	float pw_min;
